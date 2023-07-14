@@ -1,5 +1,5 @@
 # File Operations
-A Rest Api For Storing Files and Their Contents on mysql database
+A Rest Api using Spring Boot For Storing Files and Their Contents on Mysql Database
 
 
 # Getting Started
