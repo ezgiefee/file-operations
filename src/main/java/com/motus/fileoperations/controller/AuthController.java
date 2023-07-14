@@ -1,11 +1,10 @@
 package com.motus.fileoperations.controller;
 
 import com.motus.fileoperations.dto.AuthResponseDTO;
-import com.motus.fileoperations.dto.LoginDto;
+import com.motus.fileoperations.dto.UserDto;
 import com.motus.fileoperations.dto.RegisterDto;
-import com.motus.fileoperations.model.UserEntity;
-import com.motus.fileoperations.repository.UserRepository;
 import com.motus.fileoperations.security.JWTGenerator;
+import com.motus.fileoperations.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,15 +23,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/auth")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JWTGenerator jwtGenerator;
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository,
+    public AuthController(AuthenticationManager authenticationManager, UserService userService,
                           PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
     }
@@ -41,7 +40,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(
             @Parameter(description = "Username and password inside a JSON object with double quotes")
-            @RequestBody LoginDto loginDto){
+            @RequestBody UserDto loginDto){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getUsername(),
@@ -56,15 +55,15 @@ public class AuthController {
     public ResponseEntity<String> register(
             @Parameter(description = "Username and password inside a JSON object with double quotes")
             @RequestBody RegisterDto registerDto) {
-        if (userRepository.existsByUsername(registerDto.getUsername())) {
+        if (userService.existsByUsername(registerDto.getUsername())) {
             return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
         }
 
-        UserEntity user = new UserEntity();
-        user.setUsername(registerDto.getUsername());
-        user.setPassword(passwordEncoder.encode((registerDto.getPassword())));
+        UserDto userDto = new UserDto();
+        userDto.setUsername(registerDto.getUsername());
+        userDto.setPassword(passwordEncoder.encode((registerDto.getPassword())));
 
-        userRepository.save(user);
+        userService.saveUser(userDto);
 
         return new ResponseEntity<>("User registered success!", HttpStatus.OK);
     }
