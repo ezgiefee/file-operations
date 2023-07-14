@@ -1,5 +1,6 @@
-package com.motus.fileoperations.security;
+package com.motus.fileoperations.security.jwt;
 
+import com.motus.fileoperations.security.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

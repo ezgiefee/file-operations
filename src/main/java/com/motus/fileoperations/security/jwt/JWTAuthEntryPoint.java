@@ -1,4 +1,4 @@
-package com.motus.fileoperations.security;
+package com.motus.fileoperations.security.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
