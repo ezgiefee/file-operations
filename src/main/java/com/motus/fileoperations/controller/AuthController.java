@@ -10,9 +10,7 @@ import com.motus.fileoperations.payload.response.JwtResponse;
 import com.motus.fileoperations.payload.response.MessageResponse;
 import com.motus.fileoperations.payload.response.TokenRefreshResponse;
 import com.motus.fileoperations.security.jwt.JWTGenerator;
-import com.motus.fileoperations.security.service.CustomUserDetailsService;
 import com.motus.fileoperations.security.service.RefreshTokenService;
-import com.motus.fileoperations.security.service.UserDetailsService;
 import com.motus.fileoperations.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,11 +22,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.security.core.context.SecurityContextHolder.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Authentication", description = "Authentication Processes")
 @RestController
@@ -49,37 +47,25 @@ public class AuthController {
     @Autowired
     RefreshTokenService refreshTokenService;
 
-    @Autowired
-    CustomUserDetailsService customUserDetailsService;
-
-
     @Operation(summary = "Login with a username and password")
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @Parameter(description = "Username and password inside a JSON object with double quotes")
-            @Valid @RequestBody LoginRequest loginRequest){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()));
+    public ResponseEntity<?> login(@Parameter(description = "Username and password inside a JSON object with double quotes") @Valid @RequestBody LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         String token = jwtGenerator.generateToken(authentication);
         UserDto user = userService.findByUserName(loggedInUser.getName());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        return ResponseEntity.ok(new JwtResponse(token, refreshToken.getToken(), user.getId(),
-                user.getUsername(),user.getEmail()));
+        return ResponseEntity.ok(new JwtResponse(token, refreshToken.getToken(), user.getId(), user.getUsername(), user.getEmail()));
     }
 
     @Operation(summary = "Register with a username and password")
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> register(
-            @Parameter(description = "Username and password inside a JSON object with double quotes")
-            @RequestBody SignupRequest registerDto) {
+    public ResponseEntity<MessageResponse> register(@Parameter(description = "Username and password inside a JSON object with double quotes") @RequestBody SignupRequest registerDto) {
         if (userService.existsByUsername(registerDto.getUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-        } else if (userService.existsByEmail(registerDto.getEmail())){
+        } else if (userService.existsByEmail(registerDto.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
@@ -92,21 +78,20 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
+    @Operation(summary = "Refresh the token")
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<?> refreshtoken(@Parameter(description = "Refresh token inside as a string")
+                                          @Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
-        return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
+        return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser).map(user -> {
                     String token = jwtGenerator.generateTokenFromUsername(user.getUsername());
                     return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
-                })
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
-                        "Refresh token is not in database!"));
+                }).orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 
+    @Operation(summary = "Logout the user")
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();

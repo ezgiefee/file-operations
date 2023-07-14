@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 @Service
-public class CustomUserDetailsService  implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private UserRepository userRepository;
 

@@ -41,7 +41,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(info)
-                .servers(List.of(localServer,productionServer));
+                .servers(List.of(localServer, productionServer));
 
     }
 }

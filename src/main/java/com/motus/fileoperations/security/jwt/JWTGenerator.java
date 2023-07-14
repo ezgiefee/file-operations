@@ -2,15 +2,13 @@ package com.motus.fileoperations.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.security.SignatureException;
 import java.util.Date;
-import org.slf4j.Logger;
 
 import static com.motus.fileoperations.security.jwt.SecurityConstants.jwtRefreshExpirationMs;
 import static com.motus.fileoperations.security.jwt.SecurityConstants.jwtSecret;
@@ -26,10 +24,11 @@ public class JWTGenerator {
                 .setSubject(authentication.getName())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + SecurityConstants.JWT_EXPIRATION))
-                .signWith(key,SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-    public String getUsernameFromJWT(String token){
+
+    public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -56,6 +55,7 @@ public class JWTGenerator {
         }
         return false;
     }
+
     public String generateTokenFromUsername(String username) {
         return Jwts.builder().setSubject(username).setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationMs))

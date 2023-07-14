@@ -13,34 +13,34 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserDto findByUserName(String userName){
+    public UserDto findByUserName(String userName) {
         UserEntity user = userRepository.findByUsername(userName).orElse(null);
-        if(user != null){
+        if (user != null) {
             UserDto userDto = new UserDto();
             userDto.setId(user.getId());
             userDto.setUsername(user.getUsername());
             userDto.setPassword(user.getPassword());
             userDto.setEmail(user.getEmail());
             return userDto;
-        }
-        else {
+        } else {
             return null;
         }
     }
 
-    public Boolean existsByUsername(String username){
+    public Boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
 
-    public Boolean existsByEmail(String email){
+    public Boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    public void saveUser(UserDto userDto){
+    public void saveUser(UserDto userDto) {
         UserEntity user = new UserEntity();
         user.setUsername(userDto.getUsername());
         user.setPassword(userDto.getPassword());
         user.setEmail(userDto.getEmail());
-        userRepository.save(user);;
+        userRepository.save(user);
+        ;
     }
 }

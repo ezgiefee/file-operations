@@ -16,15 +16,11 @@ import java.util.List;
 
 @Tag(name = "Files", description = "Manage file operations")
 @RestController
-@RequestMapping(value= "/v1/files",produces = "application/json")
+@RequestMapping(value = "/v1/files", produces = "application/json")
 public class FileController {
 
-    private final FileService fileService;
-
     @Autowired
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
-    }
+    FileService fileService;
 
     @Operation(summary = "Save Files to Database")
     @PostMapping("/all")
@@ -34,15 +30,15 @@ public class FileController {
         try {
             fileService.saveAllFiles(folderPath);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (FileSizeLimitExceededException fileSizeLimitExceededException){
+        } catch (FileSizeLimitExceededException fileSizeLimitExceededException) {
             throw new FileSizeLimitExceededException("File size exceeds the limit");
         }
     }
 
-    @Operation(summary="Get Files From Database")
+    @Operation(summary = "Get Files From Database")
     @Schema(title = "Get Files From Database", description = "Returning the list of files that saved to database")
     @GetMapping("/all")
-    public ResponseEntity<List<FileDto>> getFilesFromDatabase(){
+    public ResponseEntity<List<FileDto>> getFilesFromDatabase() {
         return new ResponseEntity<>(fileService.getAllFiles(), HttpStatus.OK);
     }
 
@@ -51,30 +47,30 @@ public class FileController {
     @GetMapping("/{id}")
     public ResponseEntity<FileDto> getFileById(
             @Parameter(description = "The file's id to retrieve", example = "12345")
-            @PathVariable Long id){
-        return new ResponseEntity<>(fileService.getFileById(id),HttpStatus.OK);
+            @PathVariable Long id) {
+        return new ResponseEntity<>(fileService.getFileById(id), HttpStatus.OK);
     }
 
-    @Operation(summary="Get Content of A Specific File")
+    @Operation(summary = "Get Content of A Specific File")
     @Schema(title = "Get Content of A Specific File", description = "Return the content of a file as a byte array")
     @GetMapping("/content/{id}")
     public ResponseEntity<byte[]> getFileContent(
             @Parameter(description = "The file's id to get its content", example = "12345")
-            @PathVariable Long id){
-        return new ResponseEntity<>(fileService.getFileContent(id),HttpStatus.OK);
+            @PathVariable Long id) {
+        return new ResponseEntity<>(fileService.getFileContent(id), HttpStatus.OK);
     }
 
-    @Operation(summary="Update a file's name")
+    @Operation(summary = "Update a file's name")
     @Schema(title = "Update a File's Name", description = "Update the file's name on the database")
     @PutMapping("/{id}")
     public ResponseEntity<FileDto> updateFile(
             @Parameter(description = "The file's id to update", example = "12345")
             @PathVariable Long id,
             @Parameter(description = "The new name to change the file's name", example = "Oedipus")
-            @RequestParam String fileName){
+            @RequestParam String fileName) {
         try {
             return new ResponseEntity<>(fileService.updateFile(id, fileName), HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
@@ -88,7 +84,7 @@ public class FileController {
         try {
             fileService.deleteFile(id);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
