@@ -5,6 +5,7 @@ A Rest Api using Spring Boot For Storing Files and Their Contents on Mysql Datab
 # Getting Started
 * Use mvn clean install in the project root directory to build the project.
 * Run the main class, com.motus.fileoperations.FileOperationsApplication to start the application.
+* Change configurations at application.properties file according to your database choice
 
 # Swagger 
 * The springdoc-openapi is used for documentation.
