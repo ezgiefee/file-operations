@@ -1,7 +1,6 @@
 package com.motus.fileoperations.controller;
 
 import com.motus.fileoperations.dto.FileDto;
-import com.motus.fileoperations.exception.FileSizeLimitExceededException;
 import com.motus.fileoperations.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
