@@ -49,7 +49,7 @@ public class AuthController {
 
     @Operation(summary = "Login with a username and password")
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Parameter(description = "Username and password inside a JSON object with double quotes") @Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity login(@Parameter(description = "Username and password inside a JSON object with double quotes") @Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -63,9 +63,9 @@ public class AuthController {
     @Operation(summary = "Register with a username and password")
     @PostMapping("/register")
     public ResponseEntity<MessageResponse> register(@Parameter(description = "Username and password inside a JSON object with double quotes") @RequestBody SignupRequest registerDto) {
-        if (userService.existsByUsername(registerDto.getUsername())) {
+        if (Boolean.TRUE.equals(userService.existsByUsername(registerDto.getUsername()))) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-        } else if (userService.existsByEmail(registerDto.getEmail())) {
+        } else if (Boolean.TRUE.equals(userService.existsByEmail(registerDto.getEmail()))) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
@@ -80,7 +80,7 @@ public class AuthController {
 
     @Operation(summary = "Refresh the token")
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Parameter(description = "Refresh token inside as a string") @Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity refreshtoken(@Parameter(description = "Refresh token inside as a string") @Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration).map(RefreshToken::getUser).map(user -> {
@@ -91,7 +91,7 @@ public class AuthController {
 
     @Operation(summary = "Logout the user")
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity logoutUser() {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.findByUserName(loggedInUser.getName());
         refreshTokenService.deleteByUserId(user.getId());

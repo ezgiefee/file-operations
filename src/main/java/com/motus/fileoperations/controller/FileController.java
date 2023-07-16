@@ -1,6 +1,7 @@
 package com.motus.fileoperations.controller;
 
 import com.motus.fileoperations.dto.FileDto;
+import com.motus.fileoperations.payload.response.MessageResponse;
 import com.motus.fileoperations.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,12 +24,12 @@ public class FileController {
 
     @Operation(summary = "Save Files to Database")
     @PostMapping("/all")
-    public ResponseEntity<Void> saveFilesToDatabase(
+    public ResponseEntity<MessageResponse> saveFilesToDatabase(
             @Parameter(description = "Server url for reading files from", example = "/users/files")
             @RequestParam String folderPath) {
 
         fileService.saveAllFiles(folderPath);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(new MessageResponse("Files read and saved successfully!"));
 
     }
 
@@ -36,7 +37,7 @@ public class FileController {
     @Schema(title = "Get Files From Database", description = "Returning the list of files that saved to database")
     @GetMapping("/all")
     public ResponseEntity<List<FileDto>> getFilesFromDatabase() {
-        return new ResponseEntity<>(fileService.getAllFiles(), HttpStatus.OK);
+        return ResponseEntity.ok(fileService.getAllFiles());
     }
 
     @Operation(summary = "Get A File By Its Id")
@@ -45,7 +46,7 @@ public class FileController {
     public ResponseEntity<FileDto> getFileById(
             @Parameter(description = "The file's id to retrieve", example = "12345")
             @PathVariable Long id) {
-        return new ResponseEntity<>(fileService.getFileById(id), HttpStatus.OK);
+        return ResponseEntity.ok(fileService.getFileById(id));
     }
 
     @Operation(summary = "Get Content of A Specific File")
@@ -54,7 +55,7 @@ public class FileController {
     public ResponseEntity<byte[]> getFileContent(
             @Parameter(description = "The file's id to get its content", example = "12345")
             @PathVariable Long id) {
-        return new ResponseEntity<>(fileService.getFileContent(id), HttpStatus.OK);
+        return ResponseEntity.ok(fileService.getFileContent(id));
     }
 
     @Operation(summary = "Update a file's name")
@@ -66,7 +67,7 @@ public class FileController {
             @Parameter(description = "The new name to change the file's name", example = "Oedipus")
             @RequestParam String fileName) {
         try {
-            return new ResponseEntity<>(fileService.updateFile(id, fileName), HttpStatus.OK);
+            return ResponseEntity.ok(fileService.updateFile(id, fileName));
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -80,7 +81,7 @@ public class FileController {
             @PathVariable Long id) {
 
         fileService.deleteFile(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(new MessageResponse("File deleted successfully"));
 
     }
 }
