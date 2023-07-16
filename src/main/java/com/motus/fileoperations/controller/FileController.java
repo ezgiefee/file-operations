@@ -27,12 +27,10 @@ public class FileController {
     public ResponseEntity<Void> saveFilesToDatabase(
             @Parameter(description = "Server url for reading files from", example = "/users/files")
             @RequestParam String folderPath) {
-        try {
-            fileService.saveAllFiles(folderPath);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (FileSizeLimitExceededException fileSizeLimitExceededException) {
-            throw new FileSizeLimitExceededException("File size exceeds the limit");
-        }
+
+        fileService.saveAllFiles(folderPath);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @Operation(summary = "Get Files From Database")
@@ -81,11 +79,9 @@ public class FileController {
     public ResponseEntity deleteFile(
             @Parameter(description = "The file's id to delete", example = "12345")
             @PathVariable Long id) {
-        try {
-            fileService.deleteFile(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+
+        fileService.deleteFile(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 }

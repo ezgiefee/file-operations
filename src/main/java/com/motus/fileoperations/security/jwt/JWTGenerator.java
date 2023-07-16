@@ -11,12 +11,11 @@ import java.security.Key;
 import java.util.Date;
 
 import static com.motus.fileoperations.security.jwt.SecurityConstants.jwtRefreshExpirationMs;
-import static com.motus.fileoperations.security.jwt.SecurityConstants.jwtSecret;
 
 @Component
 public class JWTGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JWTGenerator.class);
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     public String generateToken(Authentication authentication) {
 
@@ -24,13 +23,13 @@ public class JWTGenerator {
                 .setSubject(authentication.getName())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + SecurityConstants.JWT_EXPIRATION))
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS512)
                 .compact();
     }
 
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -40,7 +39,7 @@ public class JWTGenerator {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(SECRET_KEY)
                     .build()
                     .parseClaimsJws(token);
             return true;
@@ -59,7 +58,7 @@ public class JWTGenerator {
     public String generateTokenFromUsername(String username) {
         return Jwts.builder().setSubject(username).setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
 }

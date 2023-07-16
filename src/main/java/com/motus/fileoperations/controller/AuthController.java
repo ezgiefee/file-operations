@@ -56,7 +56,7 @@ public class AuthController {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         String token = jwtGenerator.generateToken(authentication);
         UserDto user = userService.findByUserName(loggedInUser.getName());
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(loggedInUser.getName());
         return ResponseEntity.ok(new JwtResponse(token, refreshToken.getToken(), user.getId(), user.getUsername(), user.getEmail()));
     }
 
@@ -80,15 +80,13 @@ public class AuthController {
 
     @Operation(summary = "Refresh the token")
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Parameter(description = "Refresh token inside as a string")
-                                          @Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<?> refreshtoken(@Parameter(description = "Refresh token inside as a string") @Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
-        return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser).map(user -> {
-                    String token = jwtGenerator.generateTokenFromUsername(user.getUsername());
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
-                }).orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+        return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration).map(RefreshToken::getUser).map(user -> {
+            String token = jwtGenerator.generateTokenFromUsername(user.getUsername());
+            return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+        }).orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 
     @Operation(summary = "Logout the user")

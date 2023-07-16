@@ -1,7 +1,6 @@
 package com.motus.fileoperations.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import lombok.Setter;
 import java.time.Instant;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Getter
 @Setter
@@ -22,7 +20,10 @@ public class RefreshToken {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
+    @Column(nullable = false, unique = true)
     private String token;
+
+    @Column(nullable = false)
     private Instant expiryDate;
 
 }

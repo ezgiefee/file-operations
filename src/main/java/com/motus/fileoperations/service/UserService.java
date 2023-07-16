@@ -3,15 +3,13 @@ package com.motus.fileoperations.service;
 import com.motus.fileoperations.dto.UserDto;
 import com.motus.fileoperations.model.UserEntity;
 import com.motus.fileoperations.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    UserRepository userRepository;
 
     public UserDto findByUserName(String userName) {
         UserEntity user = userRepository.findByUsername(userName).orElse(null);

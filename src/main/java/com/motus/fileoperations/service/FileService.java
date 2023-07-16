@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -15,13 +16,10 @@ import java.util.List;
 
 @Service
 public class FileService {
-    private final FileRepository fileRepository;
+    @Autowired
+    FileRepository fileRepository;
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-    @Autowired
-    public FileService(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
-    }
     public void saveAllFiles(String folderPath) {
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
@@ -44,7 +42,7 @@ public class FileService {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not initialize folder for upload!");
         }
     }
 
@@ -95,10 +93,7 @@ public class FileService {
         return null;
     }
 
-    public void deleteFile(Long fileId){
-        FileEntity fileEntity = fileRepository.findById(fileId).orElse(null);
-        if(fileEntity != null){
-            fileRepository.deleteById(fileId);
-        }
+    public void deleteFile(Long fileId) {
+        fileRepository.deleteById(fileId);
     }
 }
