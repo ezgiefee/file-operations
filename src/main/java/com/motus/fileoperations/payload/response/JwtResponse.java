@@ -1,6 +1,5 @@
 package com.motus.fileoperations.payload.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

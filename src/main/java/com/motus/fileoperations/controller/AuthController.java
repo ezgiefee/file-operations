@@ -14,6 +14,7 @@ import com.motus.fileoperations.security.service.RefreshTokenService;
 import com.motus.fileoperations.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +49,9 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
 
     @Operation(summary = "Login with a username and password")
+    @Schema(title = "Sign in operation", description = "Sign in a user")
     @PostMapping("/login")
-    public ResponseEntity login(@Parameter(description = "Username and password inside a JSON object with double quotes") @Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> login(@Parameter(description = "Username and password inside a JSON object with double quotes") @Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -61,6 +63,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Register with a username and password")
+    @Schema(title = "Register operation", description = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<MessageResponse> register(@Parameter(description = "Username and password inside a JSON object with double quotes") @RequestBody SignupRequest registerDto) {
         if (Boolean.TRUE.equals(userService.existsByUsername(registerDto.getUsername()))) {
@@ -79,8 +82,9 @@ public class AuthController {
     }
 
     @Operation(summary = "Refresh the token")
+    @Schema(title = "Return the refresh token", description = "Return the refresh token")
     @PostMapping("/refreshtoken")
-    public ResponseEntity refreshtoken(@Parameter(description = "Refresh token inside as a string") @Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<TokenRefreshResponse> refreshtoken(@Parameter(description = "Refresh token inside as a string") @Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration).map(RefreshToken::getUser).map(user -> {
@@ -90,8 +94,9 @@ public class AuthController {
     }
 
     @Operation(summary = "Logout the user")
+    @Schema(title = "Sign out operation", description = "Sign out the user")
     @PostMapping("/signout")
-    public ResponseEntity logoutUser() {
+    public ResponseEntity<MessageResponse> logoutUser() {
         Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.findByUserName(loggedInUser.getName());
         refreshTokenService.deleteByUserId(user.getId());

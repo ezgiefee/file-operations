@@ -1,9 +1,9 @@
 package com.motus.fileoperations.dto;
 
 import jakarta.persistence.Lob;
-import lombok.Data;
+import lombok.Setter;
 
-@Data
+@Setter
 public class FileDto {
     private String fileName;
     private Long fileSize;

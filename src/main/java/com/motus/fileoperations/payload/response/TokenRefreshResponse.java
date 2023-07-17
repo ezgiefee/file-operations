@@ -1,12 +1,10 @@
 package com.motus.fileoperations.payload.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-
 public class TokenRefreshResponse {
     private String accessToken;
     private String refreshToken;

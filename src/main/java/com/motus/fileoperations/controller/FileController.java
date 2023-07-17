@@ -76,7 +76,7 @@ public class FileController {
     @Operation(summary = "Delete a file from database")
     @Schema(title = "Delete a File From Database", description = "Delete a file that is stored on database")
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteFile(
+    public ResponseEntity<MessageResponse> deleteFile(
             @Parameter(description = "The file's id to delete", example = "12345")
             @PathVariable Long id) {
 
